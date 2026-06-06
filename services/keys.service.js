@@ -1,32 +1,45 @@
 import Key from "../models/key.model.js";
 
-// Get random API key
 export const getKey = async () => {
     try {
-        const result = await Key.find();
+        const keys = await Key.aggregate([{ $sample: { size: 1 } }]);
+        if (!keys.length)
+            return {
+                success: false,
+                message:
+                    "Ingen API Nyckel hittades i databasen - lägg till nyckel i MongoDB Compass",
+            };
         return {
-            success : true,
-            key : result[Math.floor(Math.random() * result.length)].key
-        }
-    } catch(error) {
+            success: true,
+            key: keys[0].key,
+        };
+    } catch (error) {
         return {
-            success : false,
-            message : error.message
-        }
+            success: false,
+            message: error.message,
+        };
     }
-}
+};
 
-// Is key in database?
-export const keyExists = async (key) => {
+export const keyExists = async (apiKey) => {
     try {
-        const result = await Key.exists({ key });
-        if(result) {
-            return { success : true }
-        } else throw new Error('Invalid key');
-    } catch(error) {
-        return {
-            success : false,
-            message : error.message
+        const key = await Key.findOne({
+            key: apiKey,
+        });
+        if (!key) {
+            return {
+                success: false,
+                message: "Ogiltig API Nyckel",
+            };
         }
+        return {
+            success: true,
+            key: key,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.message,
+        };
     }
-}
+};

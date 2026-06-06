@@ -1,13 +1,12 @@
-import { Router } from 'express';
-import { authenticateKey } from '../middlewares/auth.middleware.js';
-import { getMenu } from '../services/menu.service.js';
+import { Router } from "express";
+import { getMenuItems } from "../services/menu.service.js";
+import { authenticateKey } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// GET menu
-router.get('/', authenticateKey, async (req, res, next) => {
-    const result = await getMenu();
-
+// GET all menu items
+router.get("/", authenticateKey, async (req, res, next) => {
+    const result = await getMenuItems();
     if (result.success) {
         res.json({
             success: true,

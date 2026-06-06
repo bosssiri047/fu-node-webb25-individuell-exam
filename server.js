@@ -1,17 +1,18 @@
+import dns from 'dns';
 import express from 'express';
 import dotenv from 'dotenv';
-import menuRouter from './routes/menu.route.js';
-import keysRouter from './routes/keys.route.js'
-import authRouter from './routes/auth.route.js';
-import cartRouter from './routes/cart.route.js';
-import orderRouter from './routes/orders.route.js';
 import mongoose from 'mongoose';
+import crypto from 'crypto';
+import menuRouter from './routes/menu.route.js';
+import ordersRouter from './routes/order.route.js';
+import keysRouter from './routes/keys.route.js';
+import authRouter from './routes/auth.route.js';
+import productsRouter from './routes/products.route.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
+import cartsRouter from './routes/carts.route.js';
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
-import { setServers } from 'node:dns/promises';
-
-setServers(['1.1.1.1', '8.8.8.8']);
+dns.setServers(['1.1.1.1']);
 
 // Config
 const app = express();
@@ -25,21 +26,22 @@ const swaggerDocs = YAML.load('./docs/docs.yml');
 app.use(express.json());
 
 // Routes
-app.use('/api/menu', menuRouter);
-app.use('/api/carts', cartRouter);
-app.use('/api/orders', orderRouter);
 app.use('/api/keys', keysRouter);
+app.use('/api/menu', menuRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/api/carts', productsRouter);
+app.use('/api/orders', ordersRouter);
 app.use('/api/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-// Server
-
+// Database
 database.on('error', (error) => console.log(error));
 database.once('connected', () => {
-    console.log('Database connected');
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
+	console.log('Database connected');
+	app.listen(PORT, () => {
+		console.log(`Server is running on port ${PORT}`);
+	});
 });
 
+// Error handler
 app.use(errorHandler);

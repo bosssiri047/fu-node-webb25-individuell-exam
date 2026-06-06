@@ -2,34 +2,25 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const cartItemSchema = new Schema({
-    prodId: {
-        type: String,
-        required: true,
-    },
-    title: {
-        type: String,
-        required: true,
-    },
-    price: {
-        type: Number,
-        required: true,
-    },
-    qty: {
-        type: Number,
-        required: true
-    }
+const cartItemsSchema = new mongoose.Schema({
+	prodId: String,
+	title: String,
+	price: Number,
+	qty: { type: Number, default: 1 },
 });
 
-const cartSchema = new Schema({
-    cartId: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    items: [
-        cartItemSchema
-    ]
+// Vad innehåller cart
+const cartSchema = new mongoose.Schema({
+	cartId: {
+		type: String,
+		unique: true,
+		required: true,
+	},
+	userId: {
+		type: String,
+		default: null,
+	},
+	items: [cartItemsSchema],
 });
 
 const Cart = mongoose.model('Cart', cartSchema);

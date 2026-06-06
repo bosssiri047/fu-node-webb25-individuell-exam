@@ -2,39 +2,34 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const orderItemSchema = new Schema({
-    prodId: {
-        type: String,
-        required: true,
-    },
-    title: {
-        type: String,
-        required: true,
-    },
-    price: {
-        type: Number,
-        required: true,
-    },
-    qty: {
-        type: Number,
-        required: true
-    }
-});
+const orderSchema = new Schema(
+	{
+		orderId: {
+			type: String,
+			required: true,
+			unique: true,
+		},
+		userId: {
+			type: String,
+			required: false, // false för att tillåta guest
+			default: null,
+		},
+		items: [
+			{
+				prodId: String,
+				title: String,
+				price: Number,
+				qty: Number,
+			},
+		],
+		sum: {
+			type: Number,
+			required: true,
+		},
+	},
 
-const orderSchema = new Schema({
-    orderId: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    cartId: {
-        type: String,
-        required: true,
-    },
-    items: [
-        orderItemSchema
-    ]
-});
+	{ timestamps: true },
+);
 
 const Order = mongoose.model('Order', orderSchema);
 
