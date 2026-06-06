@@ -1,0 +1,582 @@
+openapi: 3.0.1
+info:
+  title: Airbean Api
+  description: Api Documentaion for Airbean Api
+  version: 1.0.0
+
+components:
+  schemas:
+    Key:
+      description: API Key
+      type: string
+      example: airbean-xxxxx
+    UserBody:
+      description: User body
+      type: object
+      properties:
+        username:
+          type: string
+          example: asd123
+        password:
+          type: string
+          example: test123
+    UserBodyRegister:
+      description: User body
+      type: object
+      properties:
+        username:
+          type: string
+          example: asd123
+        password:
+          type: string
+          example: test123
+        role:
+          type: string
+          example: user
+    Cart:
+      description: Cart Patch
+      type: object
+      properties:
+        cartid: 
+          type: string
+          example: xxxxx
+        items: 
+          type: array
+          items:
+            type: object
+            properties:
+              prodId:
+                type: string
+                example: xxxxx
+              title:
+                type: string
+                example: Chips
+              price:
+                type: number
+                example: 33
+              qty:
+                type: number
+                example: 2
+    OrderCart:
+      description: Cart Patch
+      type: object
+      properties:
+        orderid: 
+          type: string
+          example: xxxxx
+        cartid: 
+          type: string
+          example: xxxxx
+        items: 
+          type: array
+          items:
+            type: object
+            properties:
+              prodId:
+                type: string
+                example: xxxxx
+              title:
+                type: string
+                example: Chips
+              price:
+                type: number
+                example: 33
+              qty:
+                type: number
+                example: 2
+    CartBody:
+      description: Cart Body
+      type: object
+      properties:
+        prodId:
+          type: string
+          example: xxxxx
+        qty:
+          type: number
+          example: 2
+        cartId:
+          type: string
+          example: xxxxx
+    UserCartBody:
+      description: User Cart Body
+      type: object
+      properties:
+        prodId:
+          type: string
+          example: xxxxx
+        qty:
+          type: number
+          example: 2
+    Menu:
+      description: Menu item
+      type: object
+      properties:
+        prodId:
+          type: string
+          example: xxxxx
+        titel:
+          type: string
+          example: xxxxx
+        desc:
+          type: string
+          example: mat är bra
+        price:
+          type: number
+          example: 50
+    Order:
+      description: Order
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: xxxxx
+        cartId:
+          type: string
+          example: xxxxx
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              prodId:
+                type: string
+                example: xxxxx
+              title:
+                type: string
+                example: Ostbollar
+              price:
+                type: number
+                example: 33
+              qty:
+                type: number
+                example: 3
+    OrderBody:
+      description: Order Body
+      type: object
+      properties:
+        cartId: 
+          type: string
+          example: xxxxx
+  responses:
+    BadRequestResponse:
+      description: Bad request from the client
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Missing or invalid request parameters
+    UnauthorizedResponse:
+      description: Unauthorized request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Missing or invalid token
+    ForbiddenResponse:
+      description: Forbidden to perform requested action
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: User not authorized to perform action
+    NotFoundResponse:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: The requested recource/s was not found
+paths:
+  /api/keys:
+    get:
+      tags:
+        - API Key
+      description: Returns a random API Key
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              key:
+                type: string
+                example: Airbean-xxxxxx
+      responses:
+        "200":
+          description: Returns a random API Key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  key:
+                    type: string
+                    example: Airbean-xxxxxx
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+  /api/menu:
+    get:
+      tags:
+        - Menu
+      description: Returns all menu items
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      responses:
+        "200":
+          description: Response containing all menu items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  menu:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/Menu'
+                        - $ref: '#/components/schemas/Menu'
+                        - $ref: '#/components/schemas/Menu'
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      description: Register new user
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema:
+              type: object
+              $ref: "#/components/schemas/UserBodyRegister"
+      responses:
+        "201":
+          description: Response for successful registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User registered
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      description: Login user
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema:
+              type: object
+              $ref: "#/components/schemas/UserBody"
+      responses:
+        "201":
+          description: Response for successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User logged in successfully
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /api/carts:
+    get:
+      tags:
+        - Cart
+      description: Returns all carts
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      responses:
+        "200":
+          description: Response containing carts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  carts:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/Cart'
+                        - $ref: '#/components/schemas/Cart'
+                        - $ref: '#/components/schemas/Cart'
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+    patch:
+      tags:
+        - Cart
+      description: Add item to cart or edit cart
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema:
+              type: object
+              $ref: "#/components/schemas/UserCartBody"
+      responses:
+        "200":
+          description: Response containing cart with added or edited item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  carts:
+                    type: object
+                    $ref: '#/components/schemas/Cart'
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+  /api/carts/{cartId}:
+    get:
+      tags:
+        - Cart
+      description: Returns cart with the same cartId
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+        - in: path
+          name: cartId
+          required: true
+          schema:
+           type: string
+           example: xxxxxx
+      responses:
+        "200":
+          description: Response containing cart with cartId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  carts:
+                    type: object
+                    $ref: '#/components/schemas/Cart'
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /api/orders:
+    get:
+      tags:
+        - Order
+      description: Returns all orders
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+        - in: path
+          name: userId
+          required: true
+          schema:
+           type: string
+           example: xxxxxx
+      responses:
+        "200":
+          description: Response containing orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  orders:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/OrderCart'
+                        - $ref: '#/components/schemas/OrderCart'
+                        - $ref: '#/components/schemas/OrderCart'
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+    post:
+      tags:
+        - Order
+      description: Put cart into an order
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+      requestBody:
+        required: true
+        content: 
+          application/json: 
+            schema:
+              type: object
+              properties:
+                cartId:
+                  type: string
+                  required: true
+                  example: xxxxx
+      responses:
+        "201":
+          description: Response for successful order add
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  orders:
+                    type: object
+                    $ref: '#/components/schemas/OrderCart'
+
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /api/orders/{userId}:
+    get:
+      tags:
+        - Order
+      description: Returns all orders from a specific user
+      parameters:
+        - in: headers
+          name: x-api-key
+          required: true
+          schema:
+            type: object
+            $ref: "#/components/schemas/Key"
+        - in: path
+          name: userId
+          required: true
+          schema:
+           type: string
+           example: xxxxxx
+      responses:
+        "200":
+          description: Response containing orders with the same cartId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  orders:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/OrderCart'
+                        - $ref: '#/components/schemas/OrderCart'
+                        - $ref: '#/components/schemas/OrderCart'
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
