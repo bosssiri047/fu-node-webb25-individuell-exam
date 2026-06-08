@@ -2,6 +2,8 @@ import { Router } from 'express';
 import crypto from 'crypto';
 import { authenticateKey } from '../middlewares/auth.middleware.js';
 import { addNewUser, getUser } from '../services/users.service.js';
+import { comparePasswords, hashPassword } from '../utils/bcrypt.utils.js';
+import { signToken } from '../utils/jwt.utils.js';
 
 const router = Router();
 router.use(authenticateKey);
@@ -33,8 +35,8 @@ router.post('/register', async (req, res, next) => {
 		const result = await addNewUser({
 			userId: crypto.randomUUID().substring(0, 5),
 			username: username,
-			password: password,
-			role: userRole,
+			password : await hashPassword(password),
+			role: role,
 		});
 
 		if (result.success) {
@@ -44,6 +46,7 @@ router.post('/register', async (req, res, next) => {
 				user: {
 					userId: result.user.userId,
 					username: result.user.username,
+					password: result.user.password,
 					role: result.user.role,
 				},
 			});
@@ -83,24 +86,48 @@ router.post('/login', async (req, res, next) => {
 		}
 
 		// 401 Unauthorized
-		if (result.user.password !== password) {
-			return next({
-				status: 401,
-				message: `Invalid Password`,
-			});
-		}
+		// if (result.user.password !== password) {
+		// 	return next({
+		// 		status: 401,
+		// 		message: `Invalid Password`,
+		// 	});
+		// }
 
 		// Global user
-		global.user = result.user;
-		res.json({
-			success: true,
-			message: `User logged in sucessfully`,
-			user: {
-				userId: result.user.userId,
-				username: result.user.username,
-				role: result.user.role,
-			},
-		});
+		// global.user = result.user;
+
+		// res.json({
+		// 	success: true,
+		// 	message: `User logged in sucessfully`,
+		// 	user: {
+		// 		userId: result.user.userId,
+		// 		username: result.user.username,
+		// 		role: result.user.role,
+		// 	},
+		// });
+		
+		// JWT
+		if(result.success) {
+        	if(await comparePasswords(password, result.user.password)) {
+        	    const token = signToken({
+        	        userId : result.user.userId, 
+        	        username : result.user.username,
+        	        role : result.user.role,
+        	    });
+
+        	    res.json({
+        	        success : true,
+        	        message : 'User logged in successfully',
+        	        user: result.user,
+        	        token
+        	    });
+        	} else {
+				return next({
+					status: 401,
+					message: `Invalid Password`,
+				});
+			}
+		}
 	} catch (error) {
 		next(error);
 	}

@@ -57,10 +57,10 @@ router.patch('/', async (req, res, next) => {
 		// Koll vem det är (bestäm cart)
 		let cartId;
 		let userId = null; //userID deklareras
-		if (global.user) {
+		if (req.user) {
 			// Inloggad användare - använd userId som cartId
-			cartId = global.user.userId;
-			userId = global.user.userId; // om inloggad läggs userId till
+			cartId = req.user.userId;
+			userId = req.user.userId; // om inloggad läggs userId till
 		} else if (guestCartId) {
 			// Gäst cartId benfintligt
 			cartId = guestCartId;

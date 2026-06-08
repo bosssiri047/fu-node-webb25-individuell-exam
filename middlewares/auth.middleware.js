@@ -1,4 +1,5 @@
 import { keyExists } from '../services/keys.service.js';
+import { verifyToken } from "../utils/jwt.utils.js";
 
 export const authenticateKey = async (req, res, next) => {
 	const apiKey = req.headers['x-api-key'];
@@ -22,29 +23,24 @@ export const authenticateKey = async (req, res, next) => {
 
 // Kontrollera att användaren är inloggad
 export const authorizeUser = (req, res, next) => {
-	const user = global.user;
-	if (!user) {
-		return next({
-			status: 401,
-			message: 'User not logged in',
-		});
-	}
-	next();
-};
+    //Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ZjYxNiIsInVzZXJuYW1lIjoiU29saWQgU25ha2UiLCJyb2xlIjoiVXNlciIsImlhdCI6MTc3OTcxMDAyOSwiZXhwIjoxNzc5NzEzNjI5fQ.LsQeJsGP8RWLFe_w91BkBfexAQz5gTAmAJDLu4_rMJ4
+    const token = req.headers['authorization']?.split(' ')[1];
+    if(!token) {
+        next({
+            status : 401,
+            message : 'No token provided'
+        })
+    }
+    const verified = verifyToken(token);
 
-//Kontrollera att användaren är admin ( extra för admin-routes )
-export const authorizeAdmin = (req, res, next) => {
-	const user = global.user;
-	if (!user) {
-		return next({
-			status: 401,
-			message: `User not logged in`,
-		});
-	}
-	if (user.role !== 'admin') {
-		return next({
-			status: 403,
-			message: `Admin acces required`,
-		});
-	}
+    if(!verified.success) {
+        next({
+            status : 401,
+            message : verified.message
+        });
+    }
+
+    req.user = verified.user;
+    console.log(req.user);
+    next();
 };

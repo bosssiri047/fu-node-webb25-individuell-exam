@@ -9,6 +9,10 @@ components:
             description: API Key
             type: string
             example: xxxxx
+        Token:
+            description: Jwt Token
+            type: string
+            example: xxxxxxxxxxxxxxxxxxxxx
         Cart:
             description: Cart for storing orders
             type: object
@@ -211,6 +215,182 @@ paths:
                     $ref: "#/components/responses/UnauthorizedResponse"
                 "404":
                     $ref: "#/components/responses/NotFoundResponse"
+        post:
+            tags:
+                - Menu
+            description: Add a new menu item
+            parameters:
+                - in: header
+                  name: x-api-key
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/Key"
+                - in: header
+                  name: Authorization
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/Token"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            description: The menu with products
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+                                    example: Caffè Doppio
+                                desc:
+                                    type: string
+                                    example: Bryggd på månadens bönor
+                                price:
+                                    type: number
+                                    example: 49
+            responses:
+                "200":
+                    description: Returns all menu items
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    item:
+                                        type: object
+                                        items:
+                                            $ref: "#/components/schemas/Product"
+                "400":
+                    description: Bad request from client
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: false
+                                    message:
+                                        type: string
+                                        example: All fields are required
+                "401":
+                    $ref: "#/components/responses/UnauthorizedResponse"
+                "403":
+                    $ref: "#/components/responses/ForbiddenResponse"
+                "404":
+                    $ref: "#/components/responses/NotFoundResponse"
+    /api/menu/{prodId}:
+        patch:
+            tags:
+                    - Menu
+            description: Update a menu item
+            parameters:
+                    - in: header
+                      name: x-api-key
+                      required: true
+                      schema:
+                          $ref: "#/components/schemas/Key"
+                    - in: header
+                      name: Authorization
+                      required: true
+                      schema:
+                          $ref: "#/components/schemas/Token"
+                    - in: path
+                      name: prodId
+                      required: true
+                      schema:
+                          type: string
+                          example: xxxxx
+            requestBody:
+                    required: true
+                    content:
+                        application/json:
+                            schema:
+                                description: The menu with products
+                                type: object
+                                properties:
+                                    title:
+                                        type: string
+                                        example: Caffè Doppio
+                                    desc:
+                                        type: string
+                                        example: Bryggd på månadens bönor
+                                    price:
+                                        type: number
+                                        example: 49
+            responses:
+                    "200":
+                        description: Item updated successfully
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        success:
+                                            type: boolean
+                                            example: true
+                                        message:
+                                            type: string
+                                            example: Item updated successfully
+                                        item:
+                                            $ref: "#/components/schemas/Product"
+                    "400":
+                        description: Bad request from client
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        success:
+                                            type: boolean
+                                            example: false
+                                        message:
+                                            type: string
+                                            example: All fields are required
+                    "401":
+                        $ref: "#/components/responses/UnauthorizedResponse"
+                    "403":
+                        $ref: "#/components/responses/ForbiddenResponse"
+        delete:
+            tags:
+                    - Menu
+            description: Delete a menu item
+            parameters:
+                    - in: header
+                      name: x-api-key
+                      required: true
+                      schema:
+                          $ref: "#/components/schemas/Key"
+                    - in: header
+                      name: Authorization
+                      required: true
+                      schema:
+                          $ref: "#/components/schemas/Token"
+                    - in: path
+                      name: prodId
+                      required: true
+                      schema:
+                          type: string
+                          example: xxxxx
+            responses:
+                    "200":
+                        description: Item deleted successfully
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        success:
+                                            type: boolean
+                                            example: true
+                                        item:
+                                            $ref: "#/components/schemas/Product"
+                    "401":
+                        $ref: "#/components/responses/UnauthorizedResponse"
+                    "403":
+                        $ref: "#/components/responses/ForbiddenResponse"
     /api/auth/register:
         post:
             tags:
